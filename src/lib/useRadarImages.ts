@@ -29,6 +29,7 @@ export function useRadarImages(product: RadarProduct) {
   const [loading, setLoading] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const timestampsRef = useRef<Date[]>([]);
+  const pollingRef = useRef(false);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -87,59 +88,68 @@ export function useRadarImages(product: RadarProduct) {
   /** Fetch only new frames without resetting user's current selection */
   const pollForUpdates = useCallback(
     async (prod: RadarProduct) => {
-      const newTs = generateTimestamps(prod);
-      const prevTs = timestampsRef.current;
+      if (pollingRef.current) return;
+      pollingRef.current = true;
 
-      const prevSet = new Set(prevTs.map((t) => t.getTime()));
-      const added = newTs.filter((t) => !prevSet.has(t.getTime()));
+      try {
+        const newTs = generateTimestamps(prod);
+        const prevTs = timestampsRef.current;
 
-      if (added.length === 0) return;
+        const prevSet = new Set(prevTs.map((t) => t.getTime()));
+        const added = newTs.filter((t) => !prevSet.has(t.getTime()));
 
-      // Find how many old timestamps fell off the beginning
-      const newSet = new Set(newTs.map((t) => t.getTime()));
-      const droppedCount = prevTs.filter((t) => !newSet.has(t.getTime())).length;
+        if (added.length === 0) return;
 
-      // Adjust selectedIndex: shift back by dropped count, keep user's frame
-      setSelectedIndex((prevIdx) => {
-        const adjusted = prevIdx - droppedCount;
-        return Math.max(0, Math.min(adjusted, newTs.length - 1));
-      });
+        // Find how many old timestamps fell off the beginning
+        const newSet = new Set(newTs.map((t) => t.getTime()));
+        const droppedCount = prevTs.filter((t) => !newSet.has(t.getTime())).length;
 
-      setTimestamps(newTs);
+        // Adjust selectedIndex: shift back by dropped count, keep user's frame
+        setSelectedIndex((prevIdx) => {
+          const adjusted = prevIdx - droppedCount;
+          return Math.max(0, Math.min(adjusted, newTs.length - 1));
+        });
 
-      // Fetch images for new timestamps only
-      for (const t of added) {
-        const url = radarUrl(prod, t);
-        const objectUrl = await fetchAndCacheImage(url);
+        setTimestamps(newTs);
+
+        // Fetch images for new timestamps only
+        for (const t of added) {
+          const url = radarUrl(prod, t);
+          const objectUrl = await fetchAndCacheImage(url);
+          setImages((prev) => {
+            const next = new Map(prev);
+            next.set(t.getTime(), { timestamp: t, objectUrl });
+            return next;
+          });
+        }
+
+        // Remove stale entries from images map
         setImages((prev) => {
-          const next = new Map(prev);
-          next.set(t.getTime(), { timestamp: t, objectUrl });
+          let changed = false;
+          for (const key of prev.keys()) {
+            if (!newSet.has(key)) {
+              changed = true;
+              break;
+            }
+          }
+          if (!changed) return prev;
+          const next = new Map<number, ImageEntry>();
+          for (const [key, val] of prev) {
+            if (newSet.has(key)) {
+              next.set(key, val);
+            } else if (val.objectUrl) {
+              URL.revokeObjectURL(val.objectUrl);
+            }
+          }
           return next;
         });
+
+        await cleanOldImages();
+      } catch {
+        // Network errors during polling are non-critical; retry on next tick
+      } finally {
+        pollingRef.current = false;
       }
-
-      // Remove stale entries from images map
-      setImages((prev) => {
-        let changed = false;
-        for (const key of prev.keys()) {
-          if (!newSet.has(key)) {
-            changed = true;
-            break;
-          }
-        }
-        if (!changed) return prev;
-        const next = new Map<number, ImageEntry>();
-        for (const [key, val] of prev) {
-          if (newSet.has(key)) {
-            next.set(key, val);
-          } else if (val.objectUrl) {
-            URL.revokeObjectURL(val.objectUrl);
-          }
-        }
-        return next;
-      });
-
-      await cleanOldImages();
     },
     [],
   );
