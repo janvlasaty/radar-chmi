@@ -1,5 +1,21 @@
 export type RadarProduct = "maxz" | "merge1h";
 
+/**
+ * CHMI's opendata server does not send CORS headers, so a cross-origin
+ * `fetch()` (e.g. from GitHub Pages) is blocked by the browser. Routing the
+ * request through a CORS proxy adds the missing `Access-Control-Allow-Origin`
+ * header. Defaults to the free images.weserv.nl image proxy; override with the
+ * `VITE_CORS_PROXY` env var (set it to an empty string to disable proxying).
+ */
+const CORS_PROXY =
+  import.meta.env.VITE_CORS_PROXY ?? "https://images.weserv.nl/?url=";
+
+/** Wrap a URL with the configured CORS proxy (no-op if the proxy is empty). */
+export function withCorsProxy(url: string): string {
+  if (!CORS_PROXY) return url;
+  return `${CORS_PROXY}${encodeURIComponent(url)}`;
+}
+
 function pad(n: number) {
   return n.toString().padStart(2, "0");
 }

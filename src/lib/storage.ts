@@ -1,4 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
+import { withCorsProxy } from "./radar";
 
 interface RadarDB extends DBSchema {
   images: {
@@ -63,7 +64,7 @@ export async function fetchAndCacheImage(url: string): Promise<string | null> {
   if (cached) return cached;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(withCorsProxy(url));
     if (!response.ok) return null;
     const blob = await response.blob();
     await cacheImage(url, blob);
