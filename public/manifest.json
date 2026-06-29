@@ -4,8 +4,8 @@
   "description": "Czech Republic weather radar viewer",
   "start_url": "/radar-chmi/",
   "display": "standalone",
-  "background_color": "#1e293b",
-  "theme_color": "#1e293b",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "/radar-chmi/icon-192.png",
