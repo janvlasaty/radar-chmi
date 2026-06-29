@@ -72,6 +72,7 @@ export function TimelinePanel({
         value={selectedIndex >= 0 ? selectedIndex : 0}
         onChange={(e) => onSelectIndex(Number(e.target.value))}
         disabled={timestamps.length === 0}
+        aria-label="Radar timeline"
         className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
       />
     </div>

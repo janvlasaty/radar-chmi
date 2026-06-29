@@ -15,6 +15,12 @@ interface ImageEntry {
   objectUrl: string | null;
 }
 
+function revokeAll(images: Map<number, ImageEntry>) {
+  for (const entry of images.values()) {
+    if (entry.objectUrl) URL.revokeObjectURL(entry.objectUrl);
+  }
+}
+
 export function useRadarImages(product: RadarProduct) {
   const [images, setImages] = useState<Map<number, ImageEntry>>(new Map());
   const [timestamps, setTimestamps] = useState<Date[]>([]);
@@ -31,6 +37,12 @@ export function useRadarImages(product: RadarProduct) {
       setLoading(true);
       const ts = generateTimestamps(prod);
       setTimestamps(ts);
+
+      // Revoke old object URLs before replacing
+      setImages((prev) => {
+        revokeAll(prev);
+        return new Map();
+      });
 
       // Load latest first for quick display
       const latestTs = ts[ts.length - 1];
@@ -69,6 +81,10 @@ export function useRadarImages(product: RadarProduct) {
     loadImages(product);
     return () => {
       abortRef.current?.abort();
+      setImages((prev) => {
+        revokeAll(prev);
+        return new Map();
+      });
     };
   }, [product, loadImages]);
 

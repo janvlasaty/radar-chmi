@@ -5,7 +5,7 @@ import { RADAR_BOUNDS } from "./lib/radar";
 import { useRadarImages } from "./lib/useRadarImages";
 import { TimelinePanel } from "./components/TimelinePanel";
 
-const PRAGUE_CENTER: [number, number] = [49.75, 15.5];
+const CZECHIA_CENTER: [number, number] = [49.75, 15.5];
 const DEFAULT_ZOOM = 8;
 
 function LocateButton() {
@@ -60,7 +60,7 @@ export default function App() {
   return (
     <div className="h-screen w-screen relative">
       <MapContainer
-        center={PRAGUE_CENTER}
+        center={CZECHIA_CENTER}
         zoom={DEFAULT_ZOOM}
         className="h-full w-full z-0"
         zoomControl={false}
