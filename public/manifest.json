@@ -1,0 +1,21 @@
+{
+  "name": "Radar CHMI",
+  "short_name": "Radar CZ",
+  "description": "Czech Republic weather radar viewer",
+  "start_url": "/radar-chmi/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "/radar-chmi/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/radar-chmi/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
