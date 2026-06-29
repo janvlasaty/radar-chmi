@@ -25,7 +25,7 @@ function LocateButton() {
   return (
     <button
       onClick={handleLocate}
-      className="absolute top-3 right-3 z-[1000] bg-white rounded-lg shadow-lg p-2.5 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
+      className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-[1000] bg-white rounded-lg shadow-lg p-2.5 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
       title="Go to my location"
       aria-label="Go to my location"
     >
@@ -58,7 +58,7 @@ export default function App() {
   } = useRadarImages(product);
 
   return (
-    <div className="h-screen w-screen relative">
+    <div className="h-full w-full relative overflow-hidden">
       <MapContainer
         center={CZECHIA_CENTER}
         zoom={DEFAULT_ZOOM}

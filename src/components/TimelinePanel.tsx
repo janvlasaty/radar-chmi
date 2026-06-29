@@ -25,7 +25,7 @@ export function TimelinePanel({
     timestamps[selectedIndex] ? formatTime(timestamps[selectedIndex]) : "--:--";
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-slate-800/95 backdrop-blur-sm text-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-slate-800/95 backdrop-blur-sm text-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))]">
       <div className="flex items-center gap-3 mb-2">
         {/* Product switcher */}
         <div className="flex rounded-lg overflow-hidden border border-slate-600 text-sm">
